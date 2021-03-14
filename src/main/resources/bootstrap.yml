@@ -1,0 +1,58 @@
+spring:
+  profiles:
+    active: local # 기본 환경 선택
+
+# local 환경
+---
+server:
+  port: 8090
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+      routes:
+        ### Member Front ###
+        - id: member-front
+          uri: lb://member-front
+          predicates:
+            - Path=/members/**
+          filters:
+            - RewritePath=/(?<segment>.*),     /backend/$\{segment}
+        ### Member Internal ###
+        - id: member-internal
+          uri: lb://member-internal
+          predicates:
+            - Path=/members/**,
+          filters:
+            - RewritePath=/(?<segment>.*),     /internal/$\{segment}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://3.34.76.99:8761/eureka
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 4000
+        readTimeout: 4000
+
