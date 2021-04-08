@@ -33,14 +33,8 @@ spring:
           predicates:
             - Path=/members/**
           filters:
+            - name: FrontAccessToken
             - RewritePath=/(?<segment>.*),     /backend/$\{segment}
-        ### Member Internal ###
-        - id: member-internal
-          uri: lb://member-internal
-          predicates:
-            - Path=/members/**,
-          filters:
-            - RewritePath=/(?<segment>.*),     /internal/$\{segment}
 
 eureka:
   instance:
