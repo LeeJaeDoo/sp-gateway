@@ -16,7 +16,7 @@ class AuthAdapter: FrontAccessTokenService {
     @Autowired
     private lateinit var authFeignClient: AuthFeignClient
 
-    override fun checkMember(accessToken: String): MemberInfo {
+    override fun checkMember(accessToken: String): String {
         return authFeignClient.checkToken(accessToken)
     }
 }

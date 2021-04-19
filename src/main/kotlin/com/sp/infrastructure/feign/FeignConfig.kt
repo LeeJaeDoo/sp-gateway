@@ -15,6 +15,6 @@ import kotlin.streams.*
 class FeignConfig {
     @Bean
     fun messageConverters(converters: ObjectProvider<HttpMessageConverter<*>>): HttpMessageConverters {
-        return HttpMessageConverters(false, converters.orderedStream().toList())
+        return HttpMessageConverters(true, converters.orderedStream().toList())
     }
 }

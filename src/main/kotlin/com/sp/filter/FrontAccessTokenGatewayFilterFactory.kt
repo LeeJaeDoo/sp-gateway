@@ -21,7 +21,7 @@ class FrontAccessTokenGatewayFilterFactory(
             else -> frontAccessTokenService.checkMember(token)
                 .let {
                     chain.filter(exchange.mutate().request(request.mutate()
-                    .header("Member-Info", it.toJson())
+                    .header("Member-Info", it)
                     .build()).build())
                 }
         }

@@ -17,6 +17,6 @@ interface AuthFeignClient {
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
-    fun checkToken(@RequestHeader accessToken: String): MemberInfo
+    fun checkToken(@RequestHeader accessToken: String): String
 
 }
