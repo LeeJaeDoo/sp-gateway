@@ -1,15 +1,16 @@
-spring:
-  profiles:
-    active: local # 기본 환경 선택
-
-# local 환경
----
 server:
   port: 8090
 
 spring:
+  profiles:
+    active: alpha # 기본 환경 선택
   application:
     name: gateway
+
+# local 환경
+---
+spring:
+  profiles: local
   cloud:
     gateway:
       globalcors:
@@ -33,14 +34,56 @@ spring:
           predicates:
             - Path=/members/**
           filters:
+            - name: FrontAccessToken
             - RewritePath=/(?<segment>.*),     /backend/$\{segment}
-        ### Member Internal ###
-        - id: member-internal
-          uri: lb://member-internal
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+auth-internal:
+  ribbon:
+    listOfServers: http://localhost:8083
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 4000
+        readTimeout: 4000
+
+# alpha 환경
+---
+spring:
+  profiles: alpha
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+      routes:
+        ### Member Front ###
+        - id: member-front
+          uri: lb://member-front
           predicates:
-            - Path=/members/**,
+            - Path=/members/**
           filters:
-            - RewritePath=/(?<segment>.*),     /internal/$\{segment}
+            - name: FrontAccessToken
+            - RewritePath=/(?<segment>.*),     /backend/$\{segment}
 
 eureka:
   instance:
