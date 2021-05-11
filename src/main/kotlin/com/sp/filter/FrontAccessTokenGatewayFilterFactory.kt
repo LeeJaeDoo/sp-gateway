@@ -19,7 +19,7 @@ class FrontAccessTokenGatewayFilterFactory(
     private val frontAccessTokenService: FrontAccessTokenService
 ) : AbstractGatewayFilterFactory<Any>() {
 
-    private val developStage: Boolean by lazy { "local" in environment.activeProfiles || "alpha" in environment.activeProfiles }
+    private val developStage: Boolean by lazy { arrayOf("local", "alpha").any { it in environment.activeProfiles } }
 
     override fun apply(config: Any?) = GatewayFilter { exchange, chain ->
         with (exchange.request) {
