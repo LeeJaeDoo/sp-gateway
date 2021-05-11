@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.*
 
 val snippetsDir: String by extra("build/generated-snippets")
 val coroutineVersion: String by extra { "1.3.9" }
@@ -39,9 +39,24 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
 
-    testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+//    testImplementation(kotlin("test-junit5"))
+//    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+//    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+
+    // junit
+    testImplementation("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+
+    // MockK
+    testImplementation("io.mockk:mockk:1.10.0")
+
+    // Spring mockK
+    testImplementation("com.ninja-squad:springmockk:2.0.3")
+
+    testImplementation("io.projectreactor:reactor-test")    // 리액티브 스트림의 단위테스트를 도움
 
     implementation("org.apache.commons:commons-pool2")
 }
@@ -59,6 +74,10 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks {
+    test {
+        useJUnitPlatform {
+            excludeEngines("junit-vintage")
+        }
+    }
 }
