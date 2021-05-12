@@ -1,9 +1,12 @@
 package com.sp.infrastructure.feign.adapter
 
 import com.sp.application.model.*
+import com.sp.filter.*
 import com.sp.infrastructure.feign.*
+import feign.*
 import org.springframework.beans.factory.annotation.*
-import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.*
+import org.springframework.http.*
 import org.springframework.stereotype.*
 
 /**
@@ -17,6 +20,13 @@ class AuthAdapter: FrontAccessTokenService {
     private lateinit var authFeignClient: AuthFeignClient
 
     override fun checkMember(accessToken: String): String {
-        return authFeignClient.checkToken(accessToken)
+        return try {
+            authFeignClient.checkToken(accessToken)
+        } catch (e: FeignException) {
+            if (e.status() == HttpStatus.UNAUTHORIZED.value()) {
+                throw InvalidTokenException()
+            }
+            throw e
+        }
     }
 }
