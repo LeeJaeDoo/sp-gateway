@@ -1,9 +1,13 @@
 package com.sp.filter
 
-import com.sp.application.model.FrontAccessTokenService
-import com.sp.filter.extensions.*
+import com.sp.application.model.*
+import com.sp.filter.FrontHeadersConstant.ACCESS_TOKEN_HEADER
+import com.sp.filter.FrontHeadersConstant.ATTRIBUTE_NAME
+import com.sp.filter.FrontHeadersConstant.TEST_ACCESS_TOKEN
 import org.springframework.cloud.gateway.filter.*
 import org.springframework.cloud.gateway.filter.factory.*
+import org.springframework.core.env.*
+import org.springframework.http.server.reactive.*
 import org.springframework.stereotype.*
 
 /**
@@ -11,19 +15,28 @@ import org.springframework.stereotype.*
  */
 @Component
 class FrontAccessTokenGatewayFilterFactory(
+    environment: Environment,
     private val frontAccessTokenService: FrontAccessTokenService
 ) : AbstractGatewayFilterFactory<Any>() {
-    override fun apply(config: Any?) = GatewayFilter { exchange, chain ->
-        val request = exchange.request
 
-        when (val token = request.headers.getFirst("accessToken")?.takeIf { it.isNotEmpty() }) {
-            null -> chain.filter(exchange.mutate().request(request.mutate().build()).build())
-            else -> frontAccessTokenService.checkMember(token)
-                .let {
-                    chain.filter(exchange.mutate().request(request.mutate()
-                    .header("Member-Info", it)
-                    .build()).build())
-                }
+    private val developStage: Boolean by lazy { arrayOf("local", "alpha").any { it in environment.activeProfiles } }
+
+    override fun apply(config: Any?) = GatewayFilter { exchange, chain ->
+        with (exchange.request) {
+            chain.filter(exchange.mutate().request(decorate(this)).build())
         }
     }
+
+    private fun decorate(request: ServerHttpRequest): ServerHttpRequest {
+        val token = request.headers.getFirst(ACCESS_TOKEN_HEADER)
+        return when {
+            token == null || isTestToken(token) -> request.mutate().build()
+            else -> request.mutate()
+                .headers { it.set(ATTRIBUTE_NAME, frontAccessTokenService.checkMember(token)) }
+                .build()
+        }
+    }
+
+    private fun isTestToken(token: String) : Boolean =
+        developStage && token == TEST_ACCESS_TOKEN
 }
