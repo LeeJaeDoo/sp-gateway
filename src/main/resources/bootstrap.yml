@@ -35,7 +35,7 @@ spring:
             - Path=/members/**
           filters:
             - name: FrontAccessToken
-            - RewritePath=/(?<segment>.*),     /backend/$\{segment}
+            - RewritePath=/(?<segment>.*),     /front/$\{segment}
 
 eureka:
   instance:
@@ -83,7 +83,7 @@ spring:
             - Path=/members/**
           filters:
             - name: FrontAccessToken
-            - RewritePath=/(?<segment>.*),     /backend/$\{segment}
+            - RewritePath=/(?<segment>.*),     /front/$\{segment}
 
 eureka:
   instance:
