@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*
 /**
  * @author Jaedoo Lee
  */
-@FeignClient("auth-internal", configuration = [FeignConfig::class])
-interface AuthFeignClient {
+@FeignClient("member-internal", configuration = [FeignConfig::class])
+interface MemberFeignClient {
 
     @GetMapping(
-        value = ["internal/auth/token/check"],
+        value = ["internal/members/token/check"],
         headers = ["Version=1.0"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]

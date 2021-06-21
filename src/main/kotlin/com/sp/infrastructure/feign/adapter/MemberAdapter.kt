@@ -13,15 +13,15 @@ import org.springframework.stereotype.*
  * @author Jaedoo Lee
  */
 @Component
-class AuthAdapter: FrontAccessTokenService {
+class MemberAdapter: FrontAccessTokenService {
 
     @Lazy
     @Autowired
-    private lateinit var authFeignClient: AuthFeignClient
+    private lateinit var memberFeignClient: MemberFeignClient
 
     override fun checkMember(accessToken: String): String {
         return try {
-            authFeignClient.checkToken(accessToken)
+            memberFeignClient.checkToken(accessToken)
         } catch (e: FeignException) {
             if (e.status() == HttpStatus.UNAUTHORIZED.value()) {
                 throw InvalidTokenException()
